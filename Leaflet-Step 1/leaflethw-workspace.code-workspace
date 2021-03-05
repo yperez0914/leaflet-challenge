@@ -1,7 +1,10 @@
 {
 	"folders": [
 		{
-			"path": "..\\..\\17-Mapping-Web"
+			"path": ".."
+		},
+		{
+			"path": "..\\..\\..\\17-Mapping-Web"
 		}
 	],
 	"settings": {}
