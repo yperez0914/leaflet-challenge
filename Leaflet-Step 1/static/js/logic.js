@@ -54,21 +54,59 @@
           layer.bindPopup("<h3>" + feature.properties.place +
             "</h3><hr><p>" + new Date(feature.properties.time) + "</p>");
         }
-        var earthquakes = L.geoJSON(earthquakeData, {
-            onEachFeature: onEachFeature
-            // pointtoLayer: function(earthquakeData, latlng){
-            //     return L.circleMarker(latlng, quakeMarker);
-            // } 
-          });
-        // var quakeMarker = {
-        //     stroke: false,
-        //     fillOpacity: 0.75,
-        //     color: "white",
-        //     fillColor: "blue",
-        //     radius: 38
-            // radius: markerSize(locations[i].city.population)
+
+    for (var i = 0; i < earthquakeData.length; i++) {
+
+        function colorSel(depth){
+            var color = "";
+            if (depth <10) {
+            color = "#ccff66";
+            }
+            else if (depth<30) {
+            color = "#ffff66";
+            }
+            else if (depth < 50) {
+            color = "ffcc66";
+            }
+            else if (depth < 70) {
+            color = "#ffa64d";
+            }
+            else if (depth < 90) {
+            color = "#e67300";
+            }
+            else {
+            color = "#ff4d4d";
+            }
+        return color
+        }
+            
+        color = colorSel(earthquakeData[i].geometry.coordinates[2]);
+        console.log(color);
+        }
+        // function markerSize(magnitude) {
+        //         return magnitude *100;
+        // }
+
+        var quakeMarker = {
+            stroke: false,
+            fillOpacity: 0.75,
+            color: "white",
+            fillColor: color,
+            radius: 38
+            // radius: markerSize(earthquakeData[i].properties.mag)
               
-        //   };
+          };
+
+        function pointToLayer(earthquakeData, latlng){
+        console.log(color);
+        return L.circleMarker(latlng, quakeMarker);
+        }
+
+        var earthquakes = L.geoJSON(earthquakeData, {
+            pointToLayer: pointToLayer,
+            onEachFeature: onEachFeature
+        });
+        
           
           // Sending our earthquakes layer to the createMap function
           createMap(earthquakes);
@@ -81,43 +119,14 @@
         console.log(data.features);
     });
 
-for (var i = 0; i < countries.length; i++) {
 
-    function colorSel(depth){
-          var color = "";
-          if (depth <10) {
-            color = "#ccff66";
-          }
-          else if (depth<30) {
-            color = "#ffff66";
-          }
-          else if (depth < 50) {
-            color = "ffcc66";
-          }
-          else if (depth < 50) {
-            color = "#ffa64d";
-          }
-          else if (depth < 50) {
-            color = "#e67300";
-          }
-          else {
-            color = "#ff4d4d";
-          }
-        return color
-        }
-        
-        color = colorSel(feature[i].geometry.coordinates[2]);
-    
-    function markerSize(magnitude) {
-         return magnitude *100;
-    }
 
-    L.circle(locations[i].coordinates, {
-      stroke: false,
-      fillOpacity: 0.75,
-      color: "white",
-      fillColor: color,
-      radius: markerSize(locations[i].city.population)
-    })
-}
+//     L.circle(locations[i].coordinates, {
+//       stroke: false,
+//       fillOpacity: 0.75,
+//       color: "white",
+//       fillColor: color,
+//       radius: markerSize(locations[i].city.population)
+//     })
+// }
 
