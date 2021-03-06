@@ -7,5 +7,7 @@
 			"path": "..\\..\\..\\17-Mapping-Web"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "leaflet-challenge"
+	}
 }
