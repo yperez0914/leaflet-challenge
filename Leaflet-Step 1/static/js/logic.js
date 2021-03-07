@@ -1,12 +1,18 @@
 
-  var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
+  var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
+     // Perform a GET request to the query URL
+     d3.json(queryUrl, function(data) {
+      // Once we get a response, send the data.features object to the createFeatures function
+      createFeatures(data.features);
+      console.log(data.features);
+  });
     function createMap(earthquakes) {
 
         // Define streetmap and darkmap layers
         var streetmap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
           attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
           tileSize: 512,
-          maxZoom: 3,
+          maxZoom: 15,
           zoomOffset: -1,
           id: "mapbox/streets-v11",
           accessToken: API_KEY
@@ -14,7 +20,7 @@
       
         var darkmap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
           attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
-          maxZoom: 3,
+          maxZoom: 15,
           id: "dark-v10",
           accessToken: API_KEY
         });
@@ -35,7 +41,7 @@
           center: [
             37.09, -95.71
           ],
-          zoom: 5,
+          zoom: 3,
           layers: [streetmap, earthquakes]
         });
       
@@ -48,85 +54,59 @@
     }
     function createFeatures(earthquakeData) {
   
-        // Define a function we want to run once for each feature in the features array
-        // Give each feature a popup describing the place and time of the earthquake
-        function onEachFeature(feature, layer) {
-          layer.bindPopup("<h3>" + feature.properties.place +
-            "</h3><hr><p>" + new Date(feature.properties.time) + "</p>");
-        }
-
-    for (var i = 0; i < earthquakeData.length; i++) {
-
         function colorSel(depth){
-            var color = "";
-            if (depth <10) {
-            color = "#ccff66";
-            }
-            else if (depth<30) {
-            color = "#ffff66";
-            }
-            else if (depth < 50) {
-            color = "ffcc66";
-            }
-            else if (depth < 70) {
-            color = "#ffa64d";
-            }
-            else if (depth < 90) {
-            color = "#e67300";
-            }
-            else {
-            color = "#ff4d4d";
-            }
-        return color
+          if (depth <10) {
+          return "#c4ff4d";
+          }
+          else if (depth<30) {
+          return  "#ffff66";
+          }
+          else if (depth < 50) {
+          return  "#ffcc66";
+          }
+          else if (depth < 70) {
+          return "#ffa64d";
+          }
+          else if (depth < 90) {
+          return  "#e67300";
+          }
+          else {
+          return  "#ff4d4d";
+          }
         }
-            
-        color = colorSel(earthquakeData[i].geometry.coordinates[2]);
-        console.log(color);
-        }
-        // function markerSize(magnitude) {
-        //         return magnitude *100;
-        // }
-
-        var quakeMarker = {
-            stroke: false,
-            fillOpacity: 0.75,
-            color: "white",
-            fillColor: color,
-            radius: 38
-            // radius: markerSize(earthquakeData[i].properties.mag)
-              
-          };
-
-        function pointToLayer(earthquakeData, latlng){
-        console.log(color);
-        return L.circleMarker(latlng, quakeMarker);
-        }
-
-        var earthquakes = L.geoJSON(earthquakeData, {
-            pointToLayer: pointToLayer,
-            onEachFeature: onEachFeature
-        });
-        
-          
+     
+      
+      function markerSize(magnitude) {
+              return magnitude *3;
+      }
+      
+      function quakeMarker(feature) {
+        return{
+        stroke: false,
+        fillOpacity: 0.75,
+        fillColor: colorSel(feature.geometry.coordinates[2]),
+        radius: markerSize(feature.properties.mag)
+        };
+      }
+    var earthquakes = L.geoJSON(earthquakeData, {
+          pointToLayer: function (feature, latlng) {
+            return L.circleMarker(latlng);
+            },
+      style: quakeMarker,
+      onEachFeature: function(feature, layer) {
+        layer.bindPopup(
+          "Magnitude: "
+            + feature.properties.mag
+            + "<br>Depth: "
+            + feature.geometry.coordinates[2]
+            + "<br>Location: "
+            + feature.properties.place
+        );
+      }
+    });
+    // .addTo(map);
+   
           // Sending our earthquakes layer to the createMap function
           createMap(earthquakes);
-    }
+    };
     
-    // Perform a GET request to the query URL
-    d3.json(queryUrl, function(data) {
-        // Once we get a response, send the data.features object to the createFeatures function
-        createFeatures(data.features);
-        console.log(data.features);
-    });
-
-
-
-//     L.circle(locations[i].coordinates, {
-//       stroke: false,
-//       fillOpacity: 0.75,
-//       color: "white",
-//       fillColor: color,
-//       radius: markerSize(locations[i].city.population)
-//     })
-// }
-
