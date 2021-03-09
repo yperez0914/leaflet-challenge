@@ -133,11 +133,6 @@
         );
       }
     });
-
-    // .addTo(map);
-    
-    
-          // Sending our earthquakes layer to the createMap function
           
           createMap(earthquakes);
   
